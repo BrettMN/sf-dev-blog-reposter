@@ -1,0 +1,16 @@
+{
+    "deploy": {
+        "project": "sf-dev-blog-reposter",
+        "entrypoint": "main.ts",
+        "include": [
+            "main.ts",
+            "deno.json",
+            "src/"
+        ],
+        "exclude": [
+            ".env",
+            ".git/",
+            "*.md"
+        ]
+    }
+}
