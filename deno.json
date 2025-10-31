@@ -14,5 +14,8 @@
             "deno.unstable"
         ],
         "strict": true
-    }
+    },
+    "unstable": [
+        "cron"
+    ]
 }
