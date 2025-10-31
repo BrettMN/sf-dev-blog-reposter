@@ -110,6 +110,14 @@ Deno.cron("Check Salesforce Blog", "0 * * * *", async () => {
   await checkAndPostNewArticles();
 });
 
+Deno.cron("Run once an hour on the hour", "0 * * * *", () => {
+  console.log("Hello, cron!");
+});
+
+Deno.cron("Run every fifteen minutes", "*/15 * * * *", () => {
+  console.log("Hello, cron!");
+});
+
 logger.info(
   "Cron job scheduled: checking Salesforce Developer Blog every hour",
 );
