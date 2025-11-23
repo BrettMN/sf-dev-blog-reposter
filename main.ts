@@ -23,12 +23,12 @@ async function checkAndPostNewArticles() {
     // Validate required environment variables
     if (!BLUESKY_IDENTIFIER || !BLUESKY_APP_PASSWORD) {
       logger.error("Missing Bluesky credentials in environment variables");
-      throw new Error("Missing Bluesky credentials");
+      // throw new Error("Missing Bluesky credentials");
     }
 
     if (!MASTODON_URL || !MASTODON_ACCESS_TOKEN) {
       logger.error("Missing Mastodon credentials in environment variables");
-      throw new Error("Missing Mastodon credentials");
+      // throw new Error("Missing Mastodon credentials");
     }
 
     // Initialize clients
