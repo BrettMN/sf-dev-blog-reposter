@@ -7,7 +7,13 @@ export interface BlogPost {
 }
 
 export async function fetchRSSFeed(url: string): Promise<BlogPost[]> {
-  const response = await fetch(url);
+  const response = await fetch(url, {
+    headers: {
+      "User-Agent":
+        "Mozilla/5.0 (compatible; RSS Reader Bot/1.0; +https://github.com/BrettMN/sf-dev-blog-reposter)",
+      "Accept": "application/rss+xml, application/xml, text/xml, */*",
+    },
+  });
   if (!response.ok) {
     throw new Error(`Failed to fetch RSS feed: ${response.statusText}`);
   }
