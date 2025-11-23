@@ -1,6 +1,6 @@
 {
     "tasks": {
-        "dev": "deno run --allow-net --allow-env --allow-read --unstable-kv --unstable-cron main.ts",
+        "dev": "DENO_ENV=development deno run --allow-net --allow-env --allow-read --unstable-kv --unstable-cron main.ts",
         "start": "deno run --allow-net --allow-env --allow-read --unstable-kv --unstable-cron main.ts"
     },
     "imports": {

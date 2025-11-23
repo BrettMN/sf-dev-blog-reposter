@@ -12,6 +12,15 @@ async function checkAndPostNewArticles() {
   logger.info("Starting check for new articles...");
 
   try {
+    // Check if we're in development mode
+    const isDev = Deno.env.get("DENO_ENV") === "development" ||
+      Deno.env.get("ENV") === "development" ||
+      Deno.args.includes("--dev");
+
+    if (isDev) {
+      logger.info("Running in DEVELOPMENT mode - API calls will be skipped");
+    }
+
     // Get environment variables
     const RSS_URL = Deno.env.get("SF_BLOG_RSS_URL") ||
       "https://developer.salesforce.com/blogs/feed";
@@ -38,8 +47,14 @@ async function checkAndPostNewArticles() {
 
     // Fetch RSS feed
     logger.info("Fetching RSS feed from:", RSS_URL);
-    const posts = await retry(() => fetchRSSFeed(RSS_URL), 3, 2000, logger);
-    logger.info(`Found ${posts.length} posts in RSS feed`);
+    let posts;
+    try {
+      posts = await retry(() => fetchRSSFeed(RSS_URL), 3, 2000, logger);
+      logger.info(`Found ${posts.length} posts in RSS feed`);
+    } catch (error) {
+      logger.error("Failed to fetch RSS feed", error);
+      throw error;
+    }
 
     // Process posts (newest first)
     let newPostsCount = 0;
@@ -51,27 +66,31 @@ async function checkAndPostNewArticles() {
 
         const message = formatSimpleMessage(post);
 
-        try {
-          // Post to Bluesky
-          logger.info("Posting to Bluesky...");
-          await retry(
-            () => bluesky.postWithLink(message, post.link),
-            3,
-            2000,
-            logger,
-          );
-          logger.info("✓ Posted to Bluesky");
-        } catch (error) {
-          logger.error("Failed to post to Bluesky", error);
-        }
+        if (!isDev) {
+          try {
+            // Post to Bluesky
+            logger.info("Posting to Bluesky...");
+            await retry(
+              () => bluesky.postWithLink(message, post.link),
+              3,
+              2000,
+              logger,
+            );
+            logger.info("✓ Posted to Bluesky");
+          } catch (error) {
+            logger.error("Failed to post to Bluesky", error);
+          }
 
-        try {
-          // Post to Mastodon
-          logger.info("Posting to Mastodon...");
-          await retry(() => mastodon.post(message), 3, 2000, logger);
-          logger.info("✓ Posted to Mastodon");
-        } catch (error) {
-          logger.error("Failed to post to Mastodon", error);
+          try {
+            // Post to Mastodon
+            logger.info("Posting to Mastodon...");
+            await retry(() => mastodon.post(message), 3, 2000, logger);
+            logger.info("✓ Posted to Mastodon");
+          } catch (error) {
+            logger.error("Failed to post to Mastodon", error);
+          }
+        } else {
+          logger.info("DEV MODE: Would post to Bluesky and Mastodon:", message);
         }
 
         // Mark as posted
